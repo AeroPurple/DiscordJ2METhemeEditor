@@ -2,6 +2,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -41,16 +43,16 @@ public class UserInterface extends JFrame {
 	final int SCREEN_WIDTH=(int) screenSize.getWidth();
 	final int SCREEN_HEIGHT=(int) screenSize.getHeight();
 	final int TOOLBAR_HEIGHT=30;
-	final int COLOUR_PANE_WIDTH=325;
+	int colourPaneWidth=325;
 	final int COLOUR_PANE_HEIGHT=1210;
 	final int SCROLLBAR_WIDTH=((Integer)UIManager.get("ScrollBar.width")).intValue()+1;
 	
 	final int LABEL_X=6;
 	final int HEADER_LABEL_HEIGHT=20;
 	final int LABEL_HEIGHT=18;
-	final int BUTTON_X=220;
+	int buttonX=220;
 	final int BUTTON_WIDTH=24;
-	final int INPUT_X=BUTTON_X+BUTTON_WIDTH+4;
+	int inputX=buttonX+BUTTON_WIDTH+4;
 	final int INPUT_WIDTH=50;
 	
 	static JToolBar toolbar;
@@ -201,14 +203,29 @@ public class UserInterface extends JFrame {
 		
 		JPanel colourPane=new JPanel();
 		colourPane.setLayout(null);
-		colourPane.setPreferredSize(new Dimension(COLOUR_PANE_WIDTH-SCROLLBAR_WIDTH, COLOUR_PANE_HEIGHT));
+		colourPane.setPreferredSize(new Dimension(colourPaneWidth-SCROLLBAR_WIDTH, COLOUR_PANE_HEIGHT));
 		
 		//maybe there's a more efficient way to do this...
 		
 		int labelY=2;
+		final int RIGHT_PADDING=28;
+		
+		//pane width will be determined by the widest label
+		//at least, it should be, unless some really weird font is used
+		
+		JLabel selectedRecipientMessageContentColorLabel=new JLabel("selectedRecipientMessageContentColor");
+		selectedRecipientMessageContentColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
+		selectedRecipientMessageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
+		colourPane.add(selectedRecipientMessageContentColorLabel);
+		FontMetrics met=selectedRecipientMessageContentColorLabel.getFontMetrics(selectedRecipientMessageContentColorLabel.getFont());
+		colourPaneWidth=met.stringWidth(selectedRecipientMessageContentColorLabel.getText())+RIGHT_PADDING;
+		colourPane.remove(selectedRecipientMessageContentColorLabel);
+		
+		buttonX=colourPaneWidth;
+		inputX=buttonX+BUTTON_WIDTH+4;
 		
 		JLabel chHeader=new JLabel("Channel view");
-		chHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		chHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		chHeader.setFont(chHeader.getFont().deriveFont(Font.BOLD));
 		chHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(chHeader);
@@ -216,12 +233,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel channelViewBackgroundColorLabel=new JLabel("channelViewBackgroundColor");
-		channelViewBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		channelViewBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		channelViewBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(channelViewBackgroundColorLabel);
 		
 		JButton channelViewBackgroundColorButton=new JButton();
-		channelViewBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		channelViewBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(channelViewBackgroundColorButton);
 		channelViewBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -231,7 +248,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		channelViewBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		channelViewBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		channelViewBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(channelViewBackgroundColorInput);
 		channelViewBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		channelViewBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -244,12 +261,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel channelViewEmptyTextColorLabel=new JLabel("channelViewEmptyTextColor");
-		channelViewEmptyTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		channelViewEmptyTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		channelViewEmptyTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(channelViewEmptyTextColorLabel);
 		
 		JButton channelViewEmptyTextColorButton=new JButton();
-		channelViewEmptyTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		channelViewEmptyTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(channelViewEmptyTextColorButton);
 		channelViewEmptyTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -259,7 +276,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		channelViewEmptyTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		channelViewEmptyTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		channelViewEmptyTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(channelViewEmptyTextColorInput);
 		channelViewEmptyTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		channelViewEmptyTextColorInput.addPropertyChangeListener("value", evt->{
@@ -272,12 +289,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel timestampColorLabel=new JLabel("timestampColor");
-		timestampColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		timestampColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		timestampColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(timestampColorLabel);
 		
 		JButton timestampColorButton=new JButton();
-		timestampColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		timestampColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(timestampColorButton);
 		timestampColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -287,7 +304,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		timestampColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		timestampColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		timestampColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(timestampColorInput);
 		timestampColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		timestampColorInput.addPropertyChangeListener("value", evt->{
@@ -300,12 +317,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedTimestampColorLabel=new JLabel("selectedTimestampColor");
-		selectedTimestampColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedTimestampColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedTimestampColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedTimestampColorLabel);
 		
 		JButton selectedTimestampColorButton=new JButton();
-		selectedTimestampColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedTimestampColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedTimestampColorButton);
 		selectedTimestampColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -315,7 +332,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedTimestampColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedTimestampColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedTimestampColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedTimestampColorInput);
 		selectedTimestampColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedTimestampColorInput.addPropertyChangeListener("value", evt->{
@@ -328,12 +345,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel linkColorLabel=new JLabel("linkColor");
-		linkColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		linkColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		linkColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(linkColorLabel);
 		
 		JButton linkColorButton=new JButton();
-		linkColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		linkColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(linkColorButton);
 		linkColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -343,7 +360,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		linkColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		linkColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		linkColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(linkColorInput);
 		linkColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		linkColorInput.addPropertyChangeListener("value", evt->{
@@ -356,12 +373,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel messageAuthorColorLabel=new JLabel("messageAuthorColor");
-		messageAuthorColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		messageAuthorColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		messageAuthorColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(messageAuthorColorLabel);
 		
 		JButton messageAuthorColorButton=new JButton();
-		messageAuthorColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		messageAuthorColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(messageAuthorColorButton);
 		messageAuthorColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -371,7 +388,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		messageAuthorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		messageAuthorColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		messageAuthorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(messageAuthorColorInput);
 		messageAuthorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		messageAuthorColorInput.addPropertyChangeListener("value", evt->{
@@ -384,12 +401,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel messageContentColorLabel=new JLabel("messageContentColor");
-		messageContentColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		messageContentColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		messageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(messageContentColorLabel);
 		
 		JButton messageContentColorButton=new JButton();
-		messageContentColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		messageContentColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(messageContentColorButton);
 		messageContentColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -399,7 +416,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		messageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		messageContentColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		messageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(messageContentColorInput);
 		messageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		messageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -412,12 +429,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel recipientMessageContentColorLabel=new JLabel("recipientMessageContentColor");
-		recipientMessageContentColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		recipientMessageContentColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		recipientMessageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(recipientMessageContentColorLabel);
 		
 		JButton recipientMessageContentColorButton=new JButton();
-		recipientMessageContentColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		recipientMessageContentColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(recipientMessageContentColorButton);
 		recipientMessageContentColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -427,7 +444,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		recipientMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		recipientMessageContentColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		recipientMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(recipientMessageContentColorInput);
 		recipientMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		recipientMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -440,12 +457,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel statusMessageContentColorLabel=new JLabel("statusMessageContentColor");
-		statusMessageContentColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		statusMessageContentColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		statusMessageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(statusMessageContentColorLabel);
 		
 		JButton statusMessageContentColorButton=new JButton();
-		statusMessageContentColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		statusMessageContentColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(statusMessageContentColorButton);
 		statusMessageContentColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -455,7 +472,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		statusMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		statusMessageContentColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		statusMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(statusMessageContentColorInput);
 		statusMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		statusMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -468,12 +485,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedMessageBackgroundColorLabel=new JLabel("selectedMessageBackgroundColor");
-		selectedMessageBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedMessageBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedMessageBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedMessageBackgroundColorLabel);
 		
 		JButton selectedMessageBackgroundColorButton=new JButton();
-		selectedMessageBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedMessageBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageBackgroundColorButton);
 		selectedMessageBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -483,7 +500,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedMessageBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedMessageBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedMessageBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageBackgroundColorInput);
 		selectedMessageBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedMessageBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -496,12 +513,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedMessageAuthorColorLabel=new JLabel("selectedMessageAuthorColor");
-		selectedMessageAuthorColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedMessageAuthorColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedMessageAuthorColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedMessageAuthorColorLabel);
 		
 		JButton selectedMessageAuthorColorButton=new JButton();
-		selectedMessageAuthorColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedMessageAuthorColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageAuthorColorButton);
 		selectedMessageAuthorColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -511,7 +528,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedMessageAuthorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedMessageAuthorColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedMessageAuthorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageAuthorColorInput);
 		selectedMessageAuthorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedMessageAuthorColorInput.addPropertyChangeListener("value", evt->{
@@ -524,12 +541,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedMessageContentColorLabel=new JLabel("selectedMessageContentColor");
-		selectedMessageContentColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedMessageContentColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedMessageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedMessageContentColorLabel);
 		
 		JButton selectedMessageContentColorButton=new JButton();
-		selectedMessageContentColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedMessageContentColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageContentColorButton);
 		selectedMessageContentColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -539,7 +556,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedMessageContentColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageContentColorInput);
 		selectedMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -551,13 +568,11 @@ public class UserInterface extends JFrame {
 		
 		labelY+=LABEL_HEIGHT;
 		
-		JLabel selectedRecipientMessageContentColorLabel=new JLabel("selectedRecipientMessageContentColor");
-		selectedRecipientMessageContentColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
-		selectedRecipientMessageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
+		selectedRecipientMessageContentColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		colourPane.add(selectedRecipientMessageContentColorLabel);
 		
 		JButton selectedRecipientMessageContentColorButton=new JButton();
-		selectedRecipientMessageContentColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedRecipientMessageContentColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedRecipientMessageContentColorButton);
 		selectedRecipientMessageContentColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -567,7 +582,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedRecipientMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedRecipientMessageContentColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedRecipientMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedRecipientMessageContentColorInput);
 		selectedRecipientMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedRecipientMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -580,12 +595,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedStatusMessageContentColorLabel=new JLabel("selectedStatusMessageContentColor");
-		selectedStatusMessageContentColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedStatusMessageContentColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedStatusMessageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedStatusMessageContentColorLabel);
 		
 		JButton selectedStatusMessageContentColorButton=new JButton();
-		selectedStatusMessageContentColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedStatusMessageContentColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedStatusMessageContentColorButton);
 		selectedStatusMessageContentColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -595,7 +610,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedStatusMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedStatusMessageContentColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedStatusMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedStatusMessageContentColorInput);
 		selectedStatusMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedStatusMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -608,7 +623,7 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel embedHeader=new JLabel("Embedded content");
-		embedHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		embedHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		embedHeader.setFont(embedHeader.getFont().deriveFont(Font.BOLD));
 		embedHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(embedHeader);
@@ -616,12 +631,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel embedBackgroundColorLabel=new JLabel("embedBackgroundColor");
-		embedBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		embedBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		embedBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(embedBackgroundColorLabel);
 		
 		JButton embedBackgroundColorButton=new JButton();
-		embedBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		embedBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(embedBackgroundColorButton);
 		embedBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -631,7 +646,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		embedBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		embedBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		embedBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(embedBackgroundColorInput);
 		embedBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		embedBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -644,12 +659,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel embedTitleColorLabel=new JLabel("embedTitleColor");
-		embedTitleColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		embedTitleColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		embedTitleColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(embedTitleColorLabel);
 		
 		JButton embedTitleColorButton=new JButton();
-		embedTitleColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		embedTitleColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(embedTitleColorButton);
 		embedTitleColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -659,7 +674,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		embedTitleColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		embedTitleColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		embedTitleColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(embedTitleColorInput);
 		embedTitleColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		embedTitleColorInput.addPropertyChangeListener("value", evt->{
@@ -672,12 +687,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel embedDescriptionColorLabel=new JLabel("embedDescriptionColor");
-		embedDescriptionColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		embedDescriptionColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		embedDescriptionColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(embedDescriptionColorLabel);
 		
 		JButton embedDescriptionColorButton=new JButton();
-		embedDescriptionColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		embedDescriptionColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(embedDescriptionColorButton);
 		embedDescriptionColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -687,7 +702,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		embedDescriptionColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		embedDescriptionColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		embedDescriptionColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(embedDescriptionColorInput);
 		embedDescriptionColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		embedDescriptionColorInput.addPropertyChangeListener("value", evt->{
@@ -700,12 +715,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedEmbedBackgroundColorLabel=new JLabel("selectedEmbedBackgroundColor");
-		selectedEmbedBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedEmbedBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedEmbedBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedEmbedBackgroundColorLabel);
 		
 		JButton selectedEmbedBackgroundColorButton=new JButton();
-		selectedEmbedBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedEmbedBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedBackgroundColorButton);
 		selectedEmbedBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -715,7 +730,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedEmbedBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedEmbedBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedEmbedBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedBackgroundColorInput);
 		selectedEmbedBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedEmbedBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -728,12 +743,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedEmbedTitleColorLabel=new JLabel("selectedEmbedTitleColor");
-		selectedEmbedTitleColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedEmbedTitleColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedEmbedTitleColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedEmbedTitleColorLabel);
 		
 		JButton selectedEmbedTitleColorButton=new JButton();
-		selectedEmbedTitleColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedEmbedTitleColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedTitleColorButton);
 		selectedEmbedTitleColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -743,7 +758,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedEmbedTitleColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedEmbedTitleColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedEmbedTitleColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedTitleColorInput);
 		selectedEmbedTitleColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedEmbedTitleColorInput.addPropertyChangeListener("value", evt->{
@@ -756,12 +771,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedEmbedDescriptionColorLabel=new JLabel("selectedEmbedDescriptionColor");
-		selectedEmbedDescriptionColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedEmbedDescriptionColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedEmbedDescriptionColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedEmbedDescriptionColorLabel);
 		
 		JButton selectedEmbedDescriptionColorButton=new JButton();
-		selectedEmbedDescriptionColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedEmbedDescriptionColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedDescriptionColorButton);
 		selectedEmbedDescriptionColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -771,7 +786,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedEmbedDescriptionColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedEmbedDescriptionColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedEmbedDescriptionColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedDescriptionColorInput);
 		selectedEmbedDescriptionColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedEmbedDescriptionColorInput.addPropertyChangeListener("value", evt->{
@@ -784,7 +799,7 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel btnHeader=new JLabel("Buttons");
-		btnHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		btnHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		btnHeader.setFont(btnHeader.getFont().deriveFont(Font.BOLD));
 		btnHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(btnHeader);
@@ -792,12 +807,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel buttonBackgroundColorLabel=new JLabel("buttonBackgroundColor");
-		buttonBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		buttonBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		buttonBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(buttonBackgroundColorLabel);
 		
 		JButton buttonBackgroundColorButton=new JButton();
-		buttonBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		buttonBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(buttonBackgroundColorButton);
 		buttonBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -807,7 +822,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		buttonBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		buttonBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		buttonBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(buttonBackgroundColorInput);
 		buttonBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		buttonBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -820,12 +835,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel buttonTextColorLabel=new JLabel("buttonTextColor");
-		buttonTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		buttonTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		buttonTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(buttonTextColorLabel);
 		
 		JButton buttonTextColorButton=new JButton();
-		buttonTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		buttonTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(buttonTextColorButton);
 		buttonTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -835,7 +850,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		buttonTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		buttonTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		buttonTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(buttonTextColorInput);
 		buttonTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		buttonTextColorInput.addPropertyChangeListener("value", evt->{
@@ -848,12 +863,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedButtonBackgroundColorLabel=new JLabel("selectedButtonBackgroundColor");
-		selectedButtonBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedButtonBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedButtonBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedButtonBackgroundColorLabel);
 		
 		JButton selectedButtonBackgroundColorButton=new JButton();
-		selectedButtonBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedButtonBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedButtonBackgroundColorButton);
 		selectedButtonBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -863,7 +878,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedButtonBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedButtonBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedButtonBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedButtonBackgroundColorInput);
 		selectedButtonBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedButtonBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -876,12 +891,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel selectedButtonTextColorLabel=new JLabel("selectedButtonTextColor");
-		selectedButtonTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		selectedButtonTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		selectedButtonTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedButtonTextColorLabel);
 		
 		JButton selectedButtonTextColorButton=new JButton();
-		selectedButtonTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		selectedButtonTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(selectedButtonTextColorButton);
 		selectedButtonTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -891,7 +906,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedButtonTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedButtonTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedButtonTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(selectedButtonTextColorInput);
 		selectedButtonTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedButtonTextColorInput.addPropertyChangeListener("value", evt->{
@@ -904,7 +919,7 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel bannerHeader=new JLabel("Banners");
-		bannerHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		bannerHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		bannerHeader.setFont(bannerHeader.getFont().deriveFont(Font.BOLD));
 		bannerHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(bannerHeader);
@@ -912,12 +927,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel bannerBackgroundColorLabel=new JLabel("bannerBackgroundColor");
-		bannerBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		bannerBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		bannerBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(bannerBackgroundColorLabel);
 		
 		JButton bannerBackgroundColorButton=new JButton();
-		bannerBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		bannerBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(bannerBackgroundColorButton);
 		bannerBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -927,7 +942,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		bannerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		bannerBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		bannerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(bannerBackgroundColorInput);
 		bannerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		bannerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -940,12 +955,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel bannerTextColorLabel=new JLabel("bannerTextColor");
-		bannerTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		bannerTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		bannerTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(bannerTextColorLabel);
 		
 		JButton bannerTextColorButton=new JButton();
-		bannerTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		bannerTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(bannerTextColorButton);
 		bannerTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -955,7 +970,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		bannerTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		bannerTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		bannerTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(bannerTextColorInput);
 		bannerTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		bannerTextColorInput.addPropertyChangeListener("value", evt->{
@@ -968,12 +983,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel outdatedBannerBackgroundColorLabel=new JLabel("outdatedBannerBackgroundColor");
-		outdatedBannerBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		outdatedBannerBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		outdatedBannerBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(outdatedBannerBackgroundColorLabel);
 		
 		JButton outdatedBannerBackgroundColorButton=new JButton();
-		outdatedBannerBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		outdatedBannerBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(outdatedBannerBackgroundColorButton);
 		outdatedBannerBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -983,7 +998,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		outdatedBannerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		outdatedBannerBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		outdatedBannerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(outdatedBannerBackgroundColorInput);
 		outdatedBannerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		outdatedBannerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -996,12 +1011,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel outdatedBannerTextColorLabel=new JLabel("outdatedBannerTextColor");
-		outdatedBannerTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		outdatedBannerTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		outdatedBannerTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(outdatedBannerTextColorLabel);
 		
 		JButton outdatedBannerTextColorButton=new JButton();
-		outdatedBannerTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		outdatedBannerTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(outdatedBannerTextColorButton);
 		outdatedBannerTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1011,7 +1026,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		outdatedBannerTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		outdatedBannerTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		outdatedBannerTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(outdatedBannerTextColorInput);
 		outdatedBannerTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		outdatedBannerTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1024,12 +1039,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel typingBannerBackgroundColorLabel=new JLabel("typingBannerBackgroundColor");
-		typingBannerBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		typingBannerBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		typingBannerBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(typingBannerBackgroundColorLabel);
 		
 		JButton typingBannerBackgroundColorButton=new JButton();
-		typingBannerBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		typingBannerBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(typingBannerBackgroundColorButton);
 		typingBannerBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1039,7 +1054,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		typingBannerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		typingBannerBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		typingBannerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(typingBannerBackgroundColorInput);
 		typingBannerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		typingBannerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1052,12 +1067,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel typingBannerTextColorLabel=new JLabel("typingBannerTextColor");
-		typingBannerTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		typingBannerTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		typingBannerTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(typingBannerTextColorLabel);
 		
 		JButton typingBannerTextColorButton=new JButton();
-		typingBannerTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		typingBannerTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(typingBannerTextColorButton);
 		typingBannerTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1067,7 +1082,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		typingBannerTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		typingBannerTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		typingBannerTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(typingBannerTextColorInput);
 		typingBannerTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		typingBannerTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1080,12 +1095,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel unreadIndicatorBackgroundColorLabel=new JLabel("unreadIndicatorBackgroundColor");
-		unreadIndicatorBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		unreadIndicatorBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		unreadIndicatorBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(unreadIndicatorBackgroundColorLabel);
 		
 		JButton unreadIndicatorBackgroundColorButton=new JButton();
-		unreadIndicatorBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		unreadIndicatorBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(unreadIndicatorBackgroundColorButton);
 		unreadIndicatorBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1095,7 +1110,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		unreadIndicatorBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		unreadIndicatorBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		unreadIndicatorBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(unreadIndicatorBackgroundColorInput);
 		unreadIndicatorBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		unreadIndicatorBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1108,12 +1123,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel unreadIndicatorTextColorLabel=new JLabel("unreadIndicatorTextColor");
-		unreadIndicatorTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		unreadIndicatorTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		unreadIndicatorTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(unreadIndicatorTextColorLabel);
 		
 		JButton unreadIndicatorTextColorButton=new JButton();
-		unreadIndicatorTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		unreadIndicatorTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(unreadIndicatorTextColorButton);
 		unreadIndicatorTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1123,7 +1138,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		unreadIndicatorTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		unreadIndicatorTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		unreadIndicatorTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(unreadIndicatorTextColorInput);
 		unreadIndicatorTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		unreadIndicatorTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1136,12 +1151,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel recipientMessageConnectorColorLabel=new JLabel("recipientMessageConnectorColor");
-		recipientMessageConnectorColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		recipientMessageConnectorColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		recipientMessageConnectorColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(recipientMessageConnectorColorLabel);
 		
 		JButton recipientMessageConnectorColorButton=new JButton();
-		recipientMessageConnectorColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		recipientMessageConnectorColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(recipientMessageConnectorColorButton);
 		recipientMessageConnectorColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1151,7 +1166,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		recipientMessageConnectorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		recipientMessageConnectorColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		recipientMessageConnectorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(recipientMessageConnectorColorInput);
 		recipientMessageConnectorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		recipientMessageConnectorColorInput.addPropertyChangeListener("value", evt->{
@@ -1164,7 +1179,7 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listHeader=new JLabel("Lists");
-		listHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		listHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		listHeader.setFont(listHeader.getFont().deriveFont(Font.BOLD));
 		listHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listHeader);
@@ -1172,12 +1187,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel listBackgroundColorLabel=new JLabel("listBackgroundColor");
-		listBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listBackgroundColorLabel);
 		
 		JButton listBackgroundColorButton=new JButton();
-		listBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listBackgroundColorButton);
 		listBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1187,7 +1202,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listBackgroundColorInput);
 		listBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1200,12 +1215,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listTextColorLabel=new JLabel("listTextColor");
-		listTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listTextColorLabel);
 		
 		JButton listTextColorButton=new JButton();
-		listTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listTextColorButton);
 		listTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1215,7 +1230,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listTextColorInput);
 		listTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1228,12 +1243,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listMutedTextColorLabel=new JLabel("listMutedTextColor");
-		listMutedTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listMutedTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listMutedTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listMutedTextColorLabel);
 		
 		JButton listMutedTextColorButton=new JButton();
-		listMutedTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listMutedTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listMutedTextColorButton);
 		listMutedTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1243,7 +1258,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listMutedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listMutedTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listMutedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listMutedTextColorInput);
 		listMutedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listMutedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1256,12 +1271,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listDescriptionTextColorLabel=new JLabel("listDescriptionTextColor");
-		listDescriptionTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listDescriptionTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listDescriptionTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listDescriptionTextColorLabel);
 		
 		JButton listDescriptionTextColorButton=new JButton();
-		listDescriptionTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listDescriptionTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listDescriptionTextColorButton);
 		listDescriptionTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1271,7 +1286,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listDescriptionTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listDescriptionTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listDescriptionTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listDescriptionTextColorInput);
 		listDescriptionTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listDescriptionTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1284,12 +1299,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listSelectedBackgroundColorLabel=new JLabel("listSelectedBackgroundColor");
-		listSelectedBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listSelectedBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listSelectedBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listSelectedBackgroundColorLabel);
 		
 		JButton listSelectedBackgroundColorButton=new JButton();
-		listSelectedBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listSelectedBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listSelectedBackgroundColorButton);
 		listSelectedBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1299,7 +1314,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedBackgroundColorInput);
 		listSelectedBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1312,12 +1327,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listSelectedTextColorLabel=new JLabel("listSelectedTextColor");
-		listSelectedTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listSelectedTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listSelectedTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listSelectedTextColorLabel);
 		
 		JButton listSelectedTextColorButton=new JButton();
-		listSelectedTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listSelectedTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listSelectedTextColorButton);
 		listSelectedTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1327,7 +1342,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedTextColorInput);
 		listSelectedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1340,12 +1355,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listSelectedMutedTextColorLabel=new JLabel("listSelectedMutedTextColor");
-		listSelectedMutedTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listSelectedMutedTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listSelectedMutedTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listSelectedMutedTextColorLabel);
 		
 		JButton listSelectedMutedTextColorButton=new JButton();
-		listSelectedMutedTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listSelectedMutedTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listSelectedMutedTextColorButton);
 		listSelectedMutedTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1355,7 +1370,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedMutedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedMutedTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedMutedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedMutedTextColorInput);
 		listSelectedMutedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedMutedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1368,12 +1383,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listSelectedDescriptionTextColorLabel=new JLabel("listSelectedDescriptionTextColor");
-		listSelectedDescriptionTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listSelectedDescriptionTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listSelectedDescriptionTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listSelectedDescriptionTextColorLabel);
 		
 		JButton listSelectedDescriptionTextColorButton=new JButton();
-		listSelectedDescriptionTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listSelectedDescriptionTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listSelectedDescriptionTextColorButton);
 		listSelectedDescriptionTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1383,7 +1398,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedDescriptionTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedDescriptionTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedDescriptionTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedDescriptionTextColorInput);
 		listSelectedDescriptionTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedDescriptionTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1396,12 +1411,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listNoItemsTextColorLabel=new JLabel("listNoItemsTextColor");
-		listNoItemsTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listNoItemsTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listNoItemsTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listNoItemsTextColorLabel);
 		
 		JButton listNoItemsTextColorButton=new JButton();
-		listNoItemsTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listNoItemsTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listNoItemsTextColorButton);
 		listNoItemsTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1411,7 +1426,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listNoItemsTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listNoItemsTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listNoItemsTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listNoItemsTextColorInput);
 		listNoItemsTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listNoItemsTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1424,12 +1439,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel listIndicatorColorLabel=new JLabel("listIndicatorColor");
-		listIndicatorColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		listIndicatorColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		listIndicatorColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(listIndicatorColorLabel);
 		
 		JButton listIndicatorColorButton=new JButton();
-		listIndicatorColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		listIndicatorColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(listIndicatorColorButton);
 		listIndicatorColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1439,7 +1454,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listIndicatorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listIndicatorColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listIndicatorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(listIndicatorColorInput);
 		listIndicatorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listIndicatorColorInput.addPropertyChangeListener("value", evt->{
@@ -1452,7 +1467,7 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel dialogHeader=new JLabel("Dialogs and pop-ups");
-		dialogHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		dialogHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		dialogHeader.setFont(dialogHeader.getFont().deriveFont(Font.BOLD));
 		dialogHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(dialogHeader);
@@ -1460,12 +1475,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel dialogBackgroundColorLabel=new JLabel("dialogBackgroundColor");
-		dialogBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		dialogBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		dialogBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(dialogBackgroundColorLabel);
 		
 		JButton dialogBackgroundColorButton=new JButton();
-		dialogBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		dialogBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(dialogBackgroundColorButton);
 		dialogBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1475,7 +1490,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		dialogBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		dialogBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		dialogBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(dialogBackgroundColorInput);
 		dialogBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		dialogBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1488,12 +1503,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel dialogTextColorLabel=new JLabel("dialogTextColor");
-		dialogTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		dialogTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		dialogTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(dialogTextColorLabel);
 		
 		JButton dialogTextColorButton=new JButton();
-		dialogTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		dialogTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(dialogTextColorButton);
 		dialogTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1503,7 +1518,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		dialogTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		dialogTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		dialogTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(dialogTextColorInput);
 		dialogTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		dialogTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1516,12 +1531,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel emojiPickerBackgroundColorLabel=new JLabel("emojiPickerBackgroundColor");
-		emojiPickerBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		emojiPickerBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		emojiPickerBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(emojiPickerBackgroundColorLabel);
 		
 		JButton emojiPickerBackgroundColorButton=new JButton();
-		emojiPickerBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		emojiPickerBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(emojiPickerBackgroundColorButton);
 		emojiPickerBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1531,7 +1546,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		emojiPickerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		emojiPickerBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		emojiPickerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(emojiPickerBackgroundColorInput);
 		emojiPickerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		emojiPickerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1544,12 +1559,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel loadingScreenBackgroundColorLabel=new JLabel("loadingScreenBackgroundColor");
-		loadingScreenBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		loadingScreenBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		loadingScreenBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(loadingScreenBackgroundColorLabel);
 		
 		JButton loadingScreenBackgroundColorButton=new JButton();
-		loadingScreenBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		loadingScreenBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(loadingScreenBackgroundColorButton);
 		loadingScreenBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1559,7 +1574,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		loadingScreenBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		loadingScreenBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		loadingScreenBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(loadingScreenBackgroundColorInput);
 		loadingScreenBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		loadingScreenBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1572,12 +1587,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel loadingScreenTextColorLabel=new JLabel("loadingScreenTextColor");
-		loadingScreenTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		loadingScreenTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		loadingScreenTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(loadingScreenTextColorLabel);
 		
 		JButton loadingScreenTextColorButton=new JButton();
-		loadingScreenTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		loadingScreenTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(loadingScreenTextColorButton);
 		loadingScreenTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1587,7 +1602,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		loadingScreenTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		loadingScreenTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		loadingScreenTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(loadingScreenTextColorInput);
 		loadingScreenTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		loadingScreenTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1600,12 +1615,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel keyMapperBackgroundColorLabel=new JLabel("keyMapperBackgroundColor");
-		keyMapperBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		keyMapperBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		keyMapperBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(keyMapperBackgroundColorLabel);
 		
 		JButton keyMapperBackgroundColorButton=new JButton();
-		keyMapperBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		keyMapperBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(keyMapperBackgroundColorButton);
 		keyMapperBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1615,7 +1630,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		keyMapperBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		keyMapperBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		keyMapperBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(keyMapperBackgroundColorInput);
 		keyMapperBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		keyMapperBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1628,12 +1643,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel keyMapperTextColorLabel=new JLabel("keyMapperTextColor");
-		keyMapperTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		keyMapperTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		keyMapperTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(keyMapperTextColorLabel);
 		
 		JButton keyMapperTextColorButton=new JButton();
-		keyMapperTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		keyMapperTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(keyMapperTextColorButton);
 		keyMapperTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1643,7 +1658,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		keyMapperTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		keyMapperTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		keyMapperTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(keyMapperTextColorInput);
 		keyMapperTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		keyMapperTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1656,12 +1671,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel imagePreviewBackgroundColorLabel=new JLabel("imagePreviewBackgroundColor");
-		imagePreviewBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		imagePreviewBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		imagePreviewBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(imagePreviewBackgroundColorLabel);
 		
 		JButton imagePreviewBackgroundColorButton=new JButton();
-		imagePreviewBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		imagePreviewBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(imagePreviewBackgroundColorButton);
 		imagePreviewBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1671,7 +1686,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		imagePreviewBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		imagePreviewBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		imagePreviewBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(imagePreviewBackgroundColorInput);
 		imagePreviewBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		imagePreviewBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1684,12 +1699,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel imagePreviewTextColorLabel=new JLabel("imagePreviewTextColor");
-		imagePreviewTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		imagePreviewTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		imagePreviewTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(imagePreviewTextColorLabel);
 		
 		JButton imagePreviewTextColorButton=new JButton();
-		imagePreviewTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		imagePreviewTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(imagePreviewTextColorButton);
 		imagePreviewTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1699,7 +1714,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		imagePreviewTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		imagePreviewTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		imagePreviewTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(imagePreviewTextColorInput);
 		imagePreviewTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		imagePreviewTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1712,7 +1727,7 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel xTextHeader=new JLabel("Message text");
-		xTextHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		xTextHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		xTextHeader.setFont(xTextHeader.getFont().deriveFont(Font.BOLD));
 		xTextHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(xTextHeader);
@@ -1720,12 +1735,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel subtextColorLabel=new JLabel("subtextColor");
-		subtextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		subtextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		subtextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(subtextColorLabel);
 		
 		JButton subtextColorButton=new JButton();
-		subtextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		subtextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(subtextColorButton);
 		subtextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1735,7 +1750,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		subtextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		subtextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		subtextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(subtextColorInput);
 		subtextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		subtextColorInput.addPropertyChangeListener("value", evt->{
@@ -1748,12 +1763,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel monospaceTextBackgroundColorLabel=new JLabel("monospaceTextBackgroundColor");
-		monospaceTextBackgroundColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		monospaceTextBackgroundColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		monospaceTextBackgroundColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(monospaceTextBackgroundColorLabel);
 		
 		JButton monospaceTextBackgroundColorButton=new JButton();
-		monospaceTextBackgroundColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		monospaceTextBackgroundColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(monospaceTextBackgroundColorButton);
 		monospaceTextBackgroundColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1763,7 +1778,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		monospaceTextBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		monospaceTextBackgroundColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		monospaceTextBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(monospaceTextBackgroundColorInput);
 		monospaceTextBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		monospaceTextBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1776,12 +1791,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel forwardedTextColorLabel=new JLabel("forwardedTextColor");
-		forwardedTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		forwardedTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		forwardedTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(forwardedTextColorLabel);
 		
 		JButton forwardedTextColorButton=new JButton();
-		forwardedTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		forwardedTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(forwardedTextColorButton);
 		forwardedTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1791,7 +1806,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		forwardedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		forwardedTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		forwardedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(forwardedTextColorInput);
 		forwardedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		forwardedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1804,12 +1819,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel editedTextColorLabel=new JLabel("editedTextColor");
-		editedTextColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		editedTextColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		editedTextColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(editedTextColorLabel);
 		
 		JButton editedTextColorButton=new JButton();
-		editedTextColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		editedTextColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(editedTextColorButton);
 		editedTextColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1819,7 +1834,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		editedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		editedTextColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		editedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(editedTextColorInput);
 		editedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		editedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1832,7 +1847,7 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel scrollHeader=new JLabel("Scrollbar");
-		scrollHeader.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, HEADER_LABEL_HEIGHT);
+		scrollHeader.setBounds(LABEL_X, labelY, colourPaneWidth, HEADER_LABEL_HEIGHT);
 		scrollHeader.setFont(scrollHeader.getFont().deriveFont(Font.BOLD));
 		scrollHeader.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(scrollHeader);
@@ -1840,12 +1855,12 @@ public class UserInterface extends JFrame {
 		labelY+=HEADER_LABEL_HEIGHT;
 		
 		JLabel scrollbarColorLabel=new JLabel("scrollbarColor");
-		scrollbarColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		scrollbarColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		scrollbarColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(scrollbarColorLabel);
 		
 		JButton scrollbarColorButton=new JButton();
-		scrollbarColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		scrollbarColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(scrollbarColorButton);
 		scrollbarColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1855,7 +1870,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		scrollbarColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		scrollbarColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		scrollbarColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(scrollbarColorInput);
 		scrollbarColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		scrollbarColorInput.addPropertyChangeListener("value", evt->{
@@ -1868,12 +1883,12 @@ public class UserInterface extends JFrame {
 		labelY+=LABEL_HEIGHT;
 		
 		JLabel scrollbarHandleColorLabel=new JLabel("scrollbarHandleColor");
-		scrollbarHandleColorLabel.setBounds(LABEL_X, labelY, COLOUR_PANE_WIDTH, LABEL_HEIGHT);
+		scrollbarHandleColorLabel.setBounds(LABEL_X, labelY, colourPaneWidth, LABEL_HEIGHT);
 		scrollbarHandleColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(scrollbarHandleColorLabel);
 		
 		JButton scrollbarHandleColorButton=new JButton();
-		scrollbarHandleColorButton.setBounds(BUTTON_X,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
+		scrollbarHandleColorButton.setBounds(buttonX,labelY+1,BUTTON_WIDTH,LABEL_HEIGHT-2);
 		colourPane.add(scrollbarHandleColorButton);
 		scrollbarHandleColorButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -1883,7 +1898,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		scrollbarHandleColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		scrollbarHandleColorInput.setBounds(INPUT_X, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		scrollbarHandleColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
 		colourPane.add(scrollbarHandleColorInput);
 		scrollbarHandleColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		scrollbarHandleColorInput.addPropertyChangeListener("value", evt->{
@@ -1893,8 +1908,10 @@ public class UserInterface extends JFrame {
 			}
 		});
 		
+		colourPaneWidth=inputX+INPUT_WIDTH+RIGHT_PADDING;
+		
 		JScrollPane scrollPane=new JScrollPane(colourPane);
-		scrollPane.setBounds(0, TOOLBAR_HEIGHT, COLOUR_PANE_WIDTH, APP_HEIGHT-TOOLBAR_HEIGHT*2-5);
+		scrollPane.setBounds(0, TOOLBAR_HEIGHT, colourPaneWidth, APP_HEIGHT-TOOLBAR_HEIGHT*2-5);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(LABEL_HEIGHT);
 		
 		contentPane.add(toolbar);
