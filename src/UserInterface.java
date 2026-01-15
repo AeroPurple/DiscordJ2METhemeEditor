@@ -53,7 +53,7 @@ public class UserInterface extends JFrame {
 	int buttonX=220;
 	final int BUTTON_WIDTH=24;
 	int inputX=buttonX+BUTTON_WIDTH+4;
-	final int INPUT_WIDTH=50;
+	int inputWidth=50;
 	
 	static JToolBar toolbar;
 	static JButton newBtn, openBtn, saveBtn, infoBtn;
@@ -208,7 +208,8 @@ public class UserInterface extends JFrame {
 		//maybe there's a more efficient way to do this...
 		
 		int labelY=2;
-		final int RIGHT_PADDING=28;
+		final int LABEL_RIGHT_PADDING=28;
+		final int INPUT_RIGHT_PADDING=8;
 		
 		//pane width will be determined by the widest label
 		//at least, it should be, unless some really weird font is used
@@ -218,8 +219,26 @@ public class UserInterface extends JFrame {
 		selectedRecipientMessageContentColorLabel.setHorizontalAlignment(JLabel.LEFT);
 		colourPane.add(selectedRecipientMessageContentColorLabel);
 		FontMetrics met=selectedRecipientMessageContentColorLabel.getFontMetrics(selectedRecipientMessageContentColorLabel.getFont());
-		colourPaneWidth=met.stringWidth(selectedRecipientMessageContentColorLabel.getText())+RIGHT_PADDING;
+		colourPaneWidth=met.stringWidth(selectedRecipientMessageContentColorLabel.getText())+LABEL_RIGHT_PADDING;
 		colourPane.remove(selectedRecipientMessageContentColorLabel);
+		
+		channelViewBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
+		channelViewBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
+		colourPane.add(channelViewBackgroundColorInput);
+		channelViewBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
+		int maxWidth=0;
+		for (int i=0; i<16; i++) {
+			channelViewBackgroundColorInput.setText(String.format("%1$s%1$s%1$s%1$s%1$s%1$s", Integer.toHexString(i)));
+			FontMetrics met2=channelViewBackgroundColorInput.getFontMetrics(channelViewBackgroundColorInput.getFont());
+			int curWidth=met2.stringWidth(channelViewBackgroundColorInput.getText());
+			if (maxWidth<curWidth) {
+				maxWidth=curWidth;
+			}
+			System.out.println(String.format("%s is %dpx wide",channelViewBackgroundColorInput.getText(), curWidth));
+		}
+		inputWidth=maxWidth+INPUT_RIGHT_PADDING;
+		System.out.println(String.format("inputs are now %d+%d=%dpx wide", maxWidth, INPUT_RIGHT_PADDING, inputWidth));
+		colourPane.remove(channelViewBackgroundColorInput);
 		
 		buttonX=colourPaneWidth;
 		inputX=buttonX+BUTTON_WIDTH+4;
@@ -248,7 +267,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		channelViewBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		channelViewBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		channelViewBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(channelViewBackgroundColorInput);
 		channelViewBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		channelViewBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -276,7 +295,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		channelViewEmptyTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		channelViewEmptyTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		channelViewEmptyTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(channelViewEmptyTextColorInput);
 		channelViewEmptyTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		channelViewEmptyTextColorInput.addPropertyChangeListener("value", evt->{
@@ -304,7 +323,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		timestampColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		timestampColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		timestampColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(timestampColorInput);
 		timestampColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		timestampColorInput.addPropertyChangeListener("value", evt->{
@@ -332,7 +351,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedTimestampColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedTimestampColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedTimestampColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedTimestampColorInput);
 		selectedTimestampColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedTimestampColorInput.addPropertyChangeListener("value", evt->{
@@ -360,7 +379,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		linkColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		linkColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		linkColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(linkColorInput);
 		linkColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		linkColorInput.addPropertyChangeListener("value", evt->{
@@ -388,7 +407,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		messageAuthorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		messageAuthorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		messageAuthorColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(messageAuthorColorInput);
 		messageAuthorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		messageAuthorColorInput.addPropertyChangeListener("value", evt->{
@@ -416,7 +435,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		messageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		messageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		messageContentColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(messageContentColorInput);
 		messageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		messageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -444,7 +463,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		recipientMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		recipientMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		recipientMessageContentColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(recipientMessageContentColorInput);
 		recipientMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		recipientMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -472,7 +491,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		statusMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		statusMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		statusMessageContentColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(statusMessageContentColorInput);
 		statusMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		statusMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -500,7 +519,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedMessageBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedMessageBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedMessageBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageBackgroundColorInput);
 		selectedMessageBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedMessageBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -528,7 +547,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedMessageAuthorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedMessageAuthorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedMessageAuthorColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageAuthorColorInput);
 		selectedMessageAuthorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedMessageAuthorColorInput.addPropertyChangeListener("value", evt->{
@@ -556,7 +575,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedMessageContentColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedMessageContentColorInput);
 		selectedMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -582,7 +601,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedRecipientMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedRecipientMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedRecipientMessageContentColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedRecipientMessageContentColorInput);
 		selectedRecipientMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedRecipientMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -610,7 +629,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedStatusMessageContentColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedStatusMessageContentColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedStatusMessageContentColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedStatusMessageContentColorInput);
 		selectedStatusMessageContentColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedStatusMessageContentColorInput.addPropertyChangeListener("value", evt->{
@@ -646,7 +665,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		embedBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		embedBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		embedBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(embedBackgroundColorInput);
 		embedBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		embedBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -674,7 +693,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		embedTitleColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		embedTitleColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		embedTitleColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(embedTitleColorInput);
 		embedTitleColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		embedTitleColorInput.addPropertyChangeListener("value", evt->{
@@ -702,7 +721,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		embedDescriptionColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		embedDescriptionColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		embedDescriptionColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(embedDescriptionColorInput);
 		embedDescriptionColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		embedDescriptionColorInput.addPropertyChangeListener("value", evt->{
@@ -730,7 +749,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedEmbedBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedEmbedBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedEmbedBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedBackgroundColorInput);
 		selectedEmbedBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedEmbedBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -758,7 +777,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedEmbedTitleColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedEmbedTitleColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedEmbedTitleColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedTitleColorInput);
 		selectedEmbedTitleColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedEmbedTitleColorInput.addPropertyChangeListener("value", evt->{
@@ -786,7 +805,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedEmbedDescriptionColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedEmbedDescriptionColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedEmbedDescriptionColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedEmbedDescriptionColorInput);
 		selectedEmbedDescriptionColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedEmbedDescriptionColorInput.addPropertyChangeListener("value", evt->{
@@ -822,7 +841,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		buttonBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		buttonBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		buttonBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(buttonBackgroundColorInput);
 		buttonBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		buttonBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -850,7 +869,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		buttonTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		buttonTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		buttonTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(buttonTextColorInput);
 		buttonTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		buttonTextColorInput.addPropertyChangeListener("value", evt->{
@@ -878,7 +897,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedButtonBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedButtonBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedButtonBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedButtonBackgroundColorInput);
 		selectedButtonBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedButtonBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -906,7 +925,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		selectedButtonTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		selectedButtonTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		selectedButtonTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(selectedButtonTextColorInput);
 		selectedButtonTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		selectedButtonTextColorInput.addPropertyChangeListener("value", evt->{
@@ -942,7 +961,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		bannerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		bannerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		bannerBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(bannerBackgroundColorInput);
 		bannerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		bannerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -970,7 +989,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		bannerTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		bannerTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		bannerTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(bannerTextColorInput);
 		bannerTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		bannerTextColorInput.addPropertyChangeListener("value", evt->{
@@ -998,7 +1017,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		outdatedBannerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		outdatedBannerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		outdatedBannerBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(outdatedBannerBackgroundColorInput);
 		outdatedBannerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		outdatedBannerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1026,7 +1045,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		outdatedBannerTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		outdatedBannerTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		outdatedBannerTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(outdatedBannerTextColorInput);
 		outdatedBannerTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		outdatedBannerTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1054,7 +1073,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		typingBannerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		typingBannerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		typingBannerBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(typingBannerBackgroundColorInput);
 		typingBannerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		typingBannerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1082,7 +1101,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		typingBannerTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		typingBannerTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		typingBannerTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(typingBannerTextColorInput);
 		typingBannerTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		typingBannerTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1110,7 +1129,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		unreadIndicatorBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		unreadIndicatorBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		unreadIndicatorBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(unreadIndicatorBackgroundColorInput);
 		unreadIndicatorBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		unreadIndicatorBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1138,7 +1157,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		unreadIndicatorTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		unreadIndicatorTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		unreadIndicatorTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(unreadIndicatorTextColorInput);
 		unreadIndicatorTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		unreadIndicatorTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1166,7 +1185,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		recipientMessageConnectorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		recipientMessageConnectorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		recipientMessageConnectorColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(recipientMessageConnectorColorInput);
 		recipientMessageConnectorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		recipientMessageConnectorColorInput.addPropertyChangeListener("value", evt->{
@@ -1202,7 +1221,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listBackgroundColorInput);
 		listBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1230,7 +1249,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listTextColorInput);
 		listTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1258,7 +1277,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listMutedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listMutedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listMutedTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listMutedTextColorInput);
 		listMutedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listMutedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1286,7 +1305,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listDescriptionTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listDescriptionTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listDescriptionTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listDescriptionTextColorInput);
 		listDescriptionTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listDescriptionTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1314,7 +1333,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedBackgroundColorInput);
 		listSelectedBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1342,7 +1361,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedTextColorInput);
 		listSelectedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1370,7 +1389,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedMutedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedMutedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedMutedTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedMutedTextColorInput);
 		listSelectedMutedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedMutedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1398,7 +1417,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listSelectedDescriptionTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listSelectedDescriptionTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listSelectedDescriptionTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listSelectedDescriptionTextColorInput);
 		listSelectedDescriptionTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listSelectedDescriptionTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1426,7 +1445,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listNoItemsTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listNoItemsTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listNoItemsTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listNoItemsTextColorInput);
 		listNoItemsTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listNoItemsTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1454,7 +1473,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		listIndicatorColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		listIndicatorColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		listIndicatorColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(listIndicatorColorInput);
 		listIndicatorColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		listIndicatorColorInput.addPropertyChangeListener("value", evt->{
@@ -1490,7 +1509,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		dialogBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		dialogBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		dialogBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(dialogBackgroundColorInput);
 		dialogBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		dialogBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1518,7 +1537,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		dialogTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		dialogTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		dialogTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(dialogTextColorInput);
 		dialogTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		dialogTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1546,7 +1565,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		emojiPickerBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		emojiPickerBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		emojiPickerBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(emojiPickerBackgroundColorInput);
 		emojiPickerBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		emojiPickerBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1574,7 +1593,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		loadingScreenBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		loadingScreenBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		loadingScreenBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(loadingScreenBackgroundColorInput);
 		loadingScreenBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		loadingScreenBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1602,7 +1621,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		loadingScreenTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		loadingScreenTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		loadingScreenTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(loadingScreenTextColorInput);
 		loadingScreenTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		loadingScreenTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1630,7 +1649,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		keyMapperBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		keyMapperBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		keyMapperBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(keyMapperBackgroundColorInput);
 		keyMapperBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		keyMapperBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1658,7 +1677,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		keyMapperTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		keyMapperTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		keyMapperTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(keyMapperTextColorInput);
 		keyMapperTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		keyMapperTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1686,7 +1705,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		imagePreviewBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		imagePreviewBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		imagePreviewBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(imagePreviewBackgroundColorInput);
 		imagePreviewBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		imagePreviewBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1714,7 +1733,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		imagePreviewTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		imagePreviewTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		imagePreviewTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(imagePreviewTextColorInput);
 		imagePreviewTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		imagePreviewTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1750,7 +1769,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		subtextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		subtextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		subtextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(subtextColorInput);
 		subtextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		subtextColorInput.addPropertyChangeListener("value", evt->{
@@ -1778,7 +1797,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		monospaceTextBackgroundColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		monospaceTextBackgroundColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		monospaceTextBackgroundColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(monospaceTextBackgroundColorInput);
 		monospaceTextBackgroundColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		monospaceTextBackgroundColorInput.addPropertyChangeListener("value", evt->{
@@ -1806,7 +1825,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		forwardedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		forwardedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		forwardedTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(forwardedTextColorInput);
 		forwardedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		forwardedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1834,7 +1853,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		editedTextColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		editedTextColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		editedTextColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(editedTextColorInput);
 		editedTextColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		editedTextColorInput.addPropertyChangeListener("value", evt->{
@@ -1870,7 +1889,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		scrollbarColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		scrollbarColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		scrollbarColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(scrollbarColorInput);
 		scrollbarColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		scrollbarColorInput.addPropertyChangeListener("value", evt->{
@@ -1898,7 +1917,7 @@ public class UserInterface extends JFrame {
 		});
 		
 		scrollbarHandleColorInput=new JFormattedTextField(createFormatter("HHHHHH"));
-		scrollbarHandleColorInput.setBounds(inputX, labelY+1, INPUT_WIDTH, LABEL_HEIGHT-2);
+		scrollbarHandleColorInput.setBounds(inputX, labelY+1, inputWidth, LABEL_HEIGHT-2);
 		colourPane.add(scrollbarHandleColorInput);
 		scrollbarHandleColorInput.setFocusLostBehavior(JFormattedTextField.COMMIT_OR_REVERT);
 		scrollbarHandleColorInput.addPropertyChangeListener("value", evt->{
@@ -1908,7 +1927,7 @@ public class UserInterface extends JFrame {
 			}
 		});
 		
-		colourPaneWidth=inputX+INPUT_WIDTH+RIGHT_PADDING;
+		colourPaneWidth=inputX+inputWidth+LABEL_RIGHT_PADDING;
 		
 		JScrollPane scrollPane=new JScrollPane(colourPane);
 		scrollPane.setBounds(0, TOOLBAR_HEIGHT, colourPaneWidth, APP_HEIGHT-TOOLBAR_HEIGHT*2-5);
