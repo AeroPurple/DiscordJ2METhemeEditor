@@ -14,6 +14,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.util.prefs.Preferences;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -117,9 +118,13 @@ public class UserInterface extends JFrame {
 								scrollbarHandleColorInput;
 	
 	boolean savedBefore=true; //TODO implement unsaved file logic
+	Preferences prefs=Preferences.userRoot().node(this.getClass().getName());
+	String lastDir;
 	
 	public UserInterface() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		lastDir=prefs.get("lastDir", "%userprofile%/Documents");
+		
 		setBounds((SCREEN_WIDTH-APP_WIDTH)/2, (SCREEN_HEIGHT-APP_HEIGHT)/2, APP_WIDTH, APP_HEIGHT);
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -234,10 +239,8 @@ public class UserInterface extends JFrame {
 			if (maxWidth<curWidth) {
 				maxWidth=curWidth;
 			}
-			System.out.println(String.format("%s is %dpx wide",channelViewBackgroundColorInput.getText(), curWidth));
 		}
 		inputWidth=maxWidth+INPUT_RIGHT_PADDING;
-		System.out.println(String.format("inputs are now %d+%d=%dpx wide", maxWidth, INPUT_RIGHT_PADDING, inputWidth));
 		colourPane.remove(channelViewBackgroundColorInput);
 		
 		buttonX=colourPaneWidth;
@@ -1938,7 +1941,7 @@ public class UserInterface extends JFrame {
 	}
 
 	protected void openBtn_mouseClicked(MouseEvent e) {
-		JFileChooser fileChooser=new JFileChooser();
+		JFileChooser fileChooser=new JFileChooser(lastDir);
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.setFileFilter(new FileFilter() {
 			
@@ -1965,6 +1968,8 @@ public class UserInterface extends JFrame {
 			}
 			if (confirmed) {
 				File selectedFile=fileChooser.getSelectedFile();
+				prefs.put("lastDir", selectedFile.getParent());
+				lastDir=prefs.get("lastDir", "%userprofile%/Documents");
 				String fileContent="";
 				try {
 					fileContent=new String(Files.readAllBytes(selectedFile.toPath()));
