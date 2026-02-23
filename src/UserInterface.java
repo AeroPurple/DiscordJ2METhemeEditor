@@ -200,6 +200,11 @@ public class UserInterface extends JFrame {
 		infoBtn=new JButton(new ImageIcon("res/information.png"));
 		infoBtn.setToolTipText("Info");
 		infoBtn.setFocusable(false);
+		infoBtn.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				infoBtn_mouseClicked(e);
+			}
+		});
 		
 		toolbar.add(newBtn);
 		toolbar.add(openBtn);
@@ -2030,6 +2035,16 @@ public class UserInterface extends JFrame {
 				showExceptionMessage(e1.getMessage());
 			}
 		}
+	}
+	
+	protected void infoBtn_mouseClicked(MouseEvent e) {
+		
+		JOptionPane.showMessageDialog(null, "Discord J2ME Theme Editor, Beta 4\n\n"
+				+ "History:\n"
+				+ "Beta 4 (2026/02/22): Added version info\n"
+				+ "Beta 3 (2026/02/02): Automatically saves last used directory\n"
+				+ "Beta 2 (2026/01/15): Made inputs vary in width depending on font\n"
+				+ "Beta 1 (2025/11/16): Initial release", "Version", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	protected static void updateInputBoxes() {
